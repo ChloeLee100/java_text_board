@@ -6,6 +6,8 @@ public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int lastArticleId = 0;
+        Article lastArticle = null;
+
         System.out.println("== Java Text Board Start ==");
 
         while (true) {
@@ -22,13 +24,23 @@ public class Main {
 
                 int id = ++lastArticleId;
 
-                Article article = new Article();
-                article.id = id;
-                article.subject = subject;
-                article.content = content;
+                Article article = new Article(id, subject, content);
+                lastArticle = article;
 
                 System.out.println("Created Article : " + article);
                 System.out.printf("Aricle %d created.\n", article.id);
+            }
+            else if (cmd.equals("/usr/article/detail")) {
+                Article article = lastArticle;
+                if (article == null) {
+                    System.out.println("No article created.");
+                    continue;
+                }
+
+                System.out.println("== Article Detail ==");
+                System.out.printf("ID : %d\n", article.id);
+                System.out.printf("Subject : %s\n", article.subject);
+                System.out.printf("Content : %s\n", article.content);
             }
             else if (cmd.equals("exit")) {
                 System.out.println("Program Ends");
@@ -48,6 +60,12 @@ class Article {
     int id;
     String subject;
     String content;
+
+    Article(int id, String subject, String content) {
+        this.id = id;
+        this.subject = subject;
+        this.content = content;
+    }
 
     @Override
     public String toString() {
