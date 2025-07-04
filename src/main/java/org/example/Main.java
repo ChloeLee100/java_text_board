@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -7,6 +9,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         int lastArticleId = 0;
         Article lastArticle = null;
+        List<Article> articles = new ArrayList<>();
 
         System.out.println("== Java Text Board Start ==");
 
@@ -15,7 +18,7 @@ public class Main {
             String cmd = sc.nextLine();
 
             if (cmd.equals("/usr/article/write")) {
-                System.out.println("== Aricle Writing ==");
+                System.out.println("== Article Writing ==");
                 System.out.print("Title : ");
                 String subject = sc.nextLine();
 
@@ -27,8 +30,29 @@ public class Main {
                 Article article = new Article(id, subject, content);
                 lastArticle = article;
 
+                articles.add(article);
+
                 System.out.println("Created Article : " + article);
-                System.out.printf("Aricle %d created.\n", article.id);
+                System.out.printf("Article %d created.\n", article.id);
+            }
+            else if (cmd.equals("/usr/article/list")) {
+                if(articles.isEmpty()) {
+                    System.out.println("No article created.");
+                    continue;
+                }
+
+                System.out.println("== Article List ==");
+
+                System.out.println("Id | Subject");
+
+//                for(int i = 0; i < articles.size(); i++) {
+//                    Article article = articles.get(i);
+//                    System.out.printf("%d | %s\n", article.id, article.subject);
+//                }
+
+                articles.forEach(
+                        article -> System.out.printf("%d | %s\n", article.id, article.subject)
+                );
             }
             else if (cmd.equals("/usr/article/detail")) {
                 Article article = lastArticle;
