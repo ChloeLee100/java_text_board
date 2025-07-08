@@ -1,8 +1,6 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     static void article_test_data(List<Article> articles) {
@@ -25,7 +23,9 @@ public class Main {
             System.out.print("Order) ");
             String cmd = sc.nextLine();
 
-            if (cmd.equals("/usr/article/write")) {
+            Rq rq = new Rq(cmd);
+
+            if (rq.urlPath.equals("/usr/article/write")) {
                 System.out.println("== Article Writing ==");
                 System.out.print("Title : ");
                 String subject = sc.nextLine();
@@ -42,7 +42,7 @@ public class Main {
                 System.out.println("Created Article : " + article);
                 System.out.printf("Article %d created.\n", article.id);
             }
-            else if (cmd.equals("/usr/article/list")) {
+            else if (rq.urlPath.equals("/usr/article/list")) {
                 if (articles.isEmpty()) {
                     System.out.println("No article created.");
                     continue;
@@ -61,7 +61,7 @@ public class Main {
 //                        article -> System.out.printf("%d | %s\n", article.id, article.subject)
 //                );
             }
-            else if (cmd.equals("/usr/article/detail")) {
+            else if (rq.urlPath.equals("/usr/article/detail")) {
                 if (articles.isEmpty()) {
                     System.out.println("No article created.");
                     continue;
@@ -79,7 +79,7 @@ public class Main {
                 System.out.printf("Subject : %s\n", article.subject);
                 System.out.printf("Content : %s\n", article.content);
             }
-            else if (cmd.equals("exit")) {
+            else if (rq.urlPath.equals("exit")) {
                 System.out.println("Program Ends");
                 break;
             }
@@ -107,5 +107,54 @@ class Article {
     @Override
     public String toString() {
         return "{id: %d, subject: \"%s\", content: \"%s\"}".formatted(id, subject, content);
+    }
+}
+
+class Rq {
+    String url;
+    Map<String, String> params;
+    String urlPath;
+
+    Rq(String url) {
+        this.url = url;
+        params = Util.getParamsFromUrl(this.url);
+        urlPath = Util.getPathFromUrl(this.url);
+    }
+
+    public Map<String, String> getParams() {
+        return params;
+    }
+
+    public String getUrlPath() {
+        return urlPath;
+    }
+}
+
+class Util {
+    static Map<String, String> getParamsFromUrl(String url) {
+        Map<String, String> params = new HashMap<>();
+        String[] urlBits = url.split("\\?", 2);
+
+        if (urlBits.length == 1) {
+            return params;
+        }
+
+        String queryStr = urlBits[1];
+
+        for (String bit : queryStr.split("&")) {
+            String[] bits = bit.split("=", 2);
+
+            if (bits.length == 1) {
+                continue;
+            }
+
+            params.put(bits[0], bits[1]);
+        }
+
+        return params;
+    }
+
+    static String getPathFromUrl (String url) {
+        return url.split("\\?", 2)[0];
     }
 }
