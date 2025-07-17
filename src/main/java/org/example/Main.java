@@ -25,7 +25,7 @@ public class Main {
 
             Rq rq = new Rq(cmd);
 
-            if (rq.urlPath.equals("/usr/article/write")) {
+            if (rq.getUrlPath().equals("/usr/article/write")) {
                 System.out.println("== Article Writing ==");
                 System.out.print("Title : ");
                 String subject = sc.nextLine();
@@ -42,44 +42,68 @@ public class Main {
                 System.out.println("Created Article : " + article);
                 System.out.printf("Article %d created.\n", article.id);
             }
-            else if (rq.urlPath.equals("/usr/article/list")) {
+            else if (rq.getUrlPath().equals("/usr/article/list")) {
                 if (articles.isEmpty()) {
                     System.out.println("No article created.");
                     continue;
+                }
+
+                Map <String, String> params = rq.getParams();
+
+                boolean orderByIdDesc = true;
+
+                if (params.containsKey("orderBy") && params.get("orderBy").equals("idAsc")) {
+                    orderByIdDesc = false;
                 }
 
                 System.out.println("== Article List ==");
 
                 System.out.println("Id | Subject");
 
-                for (int i = articles.size() - 1; i >= 0; i--) {
-                    Article article = articles.get(i);
-                    System.out.printf("%d | %s\n", article.id, article.subject);
+                List<Article> sortedArticles = articles;
+
+                if (orderByIdDesc) {
+                    sortedArticles = Util.reverseList(sortedArticles);
                 }
 
-//                articles.forEach(
-//                        article -> System.out.printf("%d | %s\n", article.id, article.subject)
-//                );
+                sortedArticles.forEach(
+                        article -> System.out.printf("%d | %s\n", article.id, article.subject)
+                );
+
             }
-            else if (rq.urlPath.equals("/usr/article/detail")) {
+            else if (rq.getUrlPath().equals("/usr/article/detail")) {
                 if (articles.isEmpty()) {
                     System.out.println("No article created.");
                     continue;
                 }
 
-                Article article = articles.get(articles.size() - 1);
+                Map <String, String> params = rq.getParams();
 
-                if (article == null) {
-                    System.out.println("No article created.");
+                if (!params.containsKey("id")) {
+                    System.out.println("Please enter the ID number.");
+                }
+
+                int id = 0;
+
+                try {
+                    id = Integer.parseInt(params.get("id"));
+                } catch (NumberFormatException e) {
+                    System.out.println("Please enter the proper ID number.");
+                }
+
+                if (id > articles.size()) {
+                    System.out.printf("Article %d is not existed.\n", id);
                     continue;
                 }
+
+                Article article = articles.get(id - 1);
 
                 System.out.println("== Article Detail ==");
                 System.out.printf("ID : %d\n", article.id);
                 System.out.printf("Subject : %s\n", article.subject);
                 System.out.printf("Content : %s\n", article.content);
             }
-            else if (rq.urlPath.equals("exit")) {
+            else if (rq.getUrlPath().equals("exit")) {
                 System.out.println("Program Ends");
                 break;
             }
@@ -156,5 +180,16 @@ class Util {
 
     static String getPathFromUrl (String url) {
         return url.split("\\?", 2)[0];
+    }
+
+    // This function makes new list without affecting original list.
+    public static<T> List<T> reverseList(List<T> list) {
+        List<T> reverse = new ArrayList<>(list.size());
+
+        for (int i = list.size() - 1; i >= 0; i--) {
+            reverse.add(list.get(i));
+        }
+
+        return reverse;
     }
 }
