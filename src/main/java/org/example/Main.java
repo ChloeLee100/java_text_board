@@ -1,12 +1,12 @@
 package org.example;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class Main {
     static void article_test_data(List<Article> articles) {
-        articles.add(new Article(1, "Subject1", "Content1"));
-        articles.add(new Article(2, "Subject2", "Content2"));
-        articles.add(new Article(3, "Subject3", "Content3"));
+        IntStream.rangeClosed(1, 100)
+                .forEach(i -> articles.add(new Article(i, "Subject" + i, "Content" + i)));
     }
 
     public static void main(String[] args) {
@@ -50,21 +50,35 @@ public class Main {
 
                 Map <String, String> params = rq.getParams();
 
+                List<Article> filteredArticles = articles;
+
+                if (params.containsKey("searchKeyword")) {
+                    String searchKeyword = params.get("searchKeyword");
+
+                    filteredArticles = new ArrayList<>();
+
+                    for (Article article : articles) {
+                        boolean matched = article.subject.contains(searchKeyword) || article.content.contains(searchKeyword);
+
+                        if (matched) filteredArticles.add(article);
+                    }
+                }
+
                 boolean orderByIdDesc = true;
 
                 if (params.containsKey("orderBy") && params.get("orderBy").equals("idAsc")) {
                     orderByIdDesc = false;
                 }
 
-                System.out.println("== Article List ==");
-
-                System.out.println("Id | Subject");
-
-                List<Article> sortedArticles = articles;
+                List<Article> sortedArticles = filteredArticles;
 
                 if (orderByIdDesc) {
                     sortedArticles = Util.reverseList(sortedArticles);
                 }
+
+                System.out.println("== Article List ==");
+
+                System.out.println("Id | Subject");
 
                 sortedArticles.forEach(
                         article -> System.out.printf("%d | %s\n", article.id, article.subject)
