@@ -43,79 +43,10 @@ public class Main {
                 System.out.printf("Article %d created.\n", article.id);
             }
             else if (rq.getUrlPath().equals("/usr/article/list")) {
-                if (articles.isEmpty()) {
-                    System.out.println("No article created.");
-                    continue;
-                }
-
-                Map <String, String> params = rq.getParams();
-
-                List<Article> filteredArticles = articles;
-
-                if (params.containsKey("searchKeyword")) {
-                    String searchKeyword = params.get("searchKeyword");
-
-                    filteredArticles = new ArrayList<>();
-
-                    for (Article article : articles) {
-                        boolean matched = article.subject.contains(searchKeyword) || article.content.contains(searchKeyword);
-
-                        if (matched) filteredArticles.add(article);
-                    }
-                }
-
-                boolean orderByIdDesc = true;
-
-                if (params.containsKey("orderBy") && params.get("orderBy").equals("idAsc")) {
-                    orderByIdDesc = false;
-                }
-
-                List<Article> sortedArticles = filteredArticles;
-
-                if (orderByIdDesc) {
-                    sortedArticles = Util.reverseList(sortedArticles);
-                }
-
-                System.out.println("== Article List ==");
-
-                System.out.println("Id | Subject");
-
-                sortedArticles.forEach(
-                        article -> System.out.printf("%d | %s\n", article.id, article.subject)
-                );
-
+                actionUsrArticleList(rq, articles);
             }
             else if (rq.getUrlPath().equals("/usr/article/detail")) {
-                if (articles.isEmpty()) {
-                    System.out.println("No article created.");
-                    continue;
-                }
-
-                Map <String, String> params = rq.getParams();
-
-                if (!params.containsKey("id")) {
-                    System.out.println("Please enter the ID number.");
-                }
-
-                int id = 0;
-
-                try {
-                    id = Integer.parseInt(params.get("id"));
-                } catch (NumberFormatException e) {
-                    System.out.println("Please enter the proper ID number.");
-                }
-
-                if (id > articles.size()) {
-                    System.out.printf("Article %d is not existed.\n", id);
-                    continue;
-                }
-
-                Article article = articles.get(id - 1);
-
-                System.out.println("== Article Detail ==");
-                System.out.printf("ID : %d\n", article.id);
-                System.out.printf("Subject : %s\n", article.subject);
-                System.out.printf("Content : %s\n", article.content);
+                actionUsrArticleDetail(rq, articles);
             }
             else if (rq.getUrlPath().equals("exit")) {
                 System.out.println("Program Ends");
@@ -128,6 +59,84 @@ public class Main {
 
         System.out.println("== Java Text Board End ==");
         sc.close();
+    }
+
+    private static void actionUsrArticleDetail(Rq rq, List<Article> articles) {
+        if (articles.isEmpty()) {
+            System.out.println("No article created.");
+            return;
+        }
+
+        Map <String, String> params = rq.getParams();
+
+        if (!params.containsKey("id")) {
+            System.out.println("Please enter the ID number.");
+            return;
+        }
+
+        int id = 0;
+
+        try {
+            id = Integer.parseInt(params.get("id"));
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter the proper ID number.");
+            return;
+        }
+
+        if (id > articles.size()) {
+            System.out.printf("Article %d is not existed.\n", id);
+            return;
+        }
+
+        Article article = articles.get(id - 1);
+
+        System.out.println("== Article Detail ==");
+        System.out.printf("ID : %d\n", article.id);
+        System.out.printf("Subject : %s\n", article.subject);
+        System.out.printf("Content : %s\n", article.content);
+    }
+
+    private static void actionUsrArticleList(Rq rq, List<Article> articles) {
+        if (articles.isEmpty()) {
+            System.out.println("No article created.");
+            return;
+        }
+
+        Map <String, String> params = rq.getParams();
+
+        List<Article> filteredArticles = articles;
+
+        if (params.containsKey("searchKeyword")) {
+            String searchKeyword = params.get("searchKeyword");
+
+            filteredArticles = new ArrayList<>();
+
+            for (Article article : articles) {
+                boolean matched = article.subject.contains(searchKeyword) || article.content.contains(searchKeyword);
+
+                if (matched) filteredArticles.add(article);
+            }
+        }
+
+        boolean orderByIdDesc = true;
+
+        if (params.containsKey("orderBy") && params.get("orderBy").equals("idAsc")) {
+            orderByIdDesc = false;
+        }
+
+        List<Article> sortedArticles = filteredArticles;
+
+        if (orderByIdDesc) {
+            sortedArticles = Util.reverseList(sortedArticles);
+        }
+
+        System.out.println("== Article List ==");
+
+        System.out.println("Id | Subject");
+
+        sortedArticles.forEach(
+                article -> System.out.printf("%d | %s\n", article.id, article.subject)
+        );
     }
 }
 
