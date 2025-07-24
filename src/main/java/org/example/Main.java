@@ -26,21 +26,8 @@ public class Main {
             Rq rq = new Rq(cmd);
 
             if (rq.getUrlPath().equals("/usr/article/write")) {
-                System.out.println("== Article Writing ==");
-                System.out.print("Title : ");
-                String subject = sc.nextLine();
-
-                System.out.print("Content : ");
-                String content = sc.nextLine();
-
-                int id = ++lastArticleId;
-
-                Article article = new Article(id, subject, content);
-
-                articles.add(article);
-
-                System.out.println("Created Article : " + article);
-                System.out.printf("Article %d created.\n", article.id);
+                actionUsrArticleWrite(sc, articles, lastArticleId);
+                lastArticleId++;
             }
             else if (rq.getUrlPath().equals("/usr/article/list")) {
                 actionUsrArticleList(rq, articles);
@@ -59,6 +46,24 @@ public class Main {
 
         System.out.println("== Java Text Board End ==");
         sc.close();
+    }
+
+    private static void actionUsrArticleWrite(Scanner sc, List<Article> articles, int lastArticleId) {
+        System.out.println("== Article Writing ==");
+        System.out.print("Title : ");
+        String subject = sc.nextLine();
+
+        System.out.print("Content : ");
+        String content = sc.nextLine();
+
+        int id = ++lastArticleId;
+
+        Article article = new Article(id, subject, content);
+
+        articles.add(article);
+
+        System.out.println("Created Article : " + article);
+        System.out.printf("Article %d created.\n", article.id);
     }
 
     private static void actionUsrArticleDetail(Rq rq, List<Article> articles) {
