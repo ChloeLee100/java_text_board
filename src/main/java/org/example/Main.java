@@ -35,6 +35,9 @@ public class Main {
             else if (rq.getUrlPath().equals("/usr/article/detail")) {
                 actionUsrArticleDetail(rq, articles);
             }
+            else if (rq.getUrlPath().equals("/usr/article/modify")) {
+                actionUsrArticleModify(sc, rq, articles);
+            }
             else if (rq.getUrlPath().equals("exit")) {
                 System.out.println("Program Ends");
                 break;
@@ -46,6 +49,44 @@ public class Main {
 
         System.out.println("== Java Text Board End ==");
         sc.close();
+    }
+
+    private static void actionUsrArticleModify(Scanner sc, Rq rq, List<Article> articles) {
+        if (articles.isEmpty()) {
+            System.out.println("No article created.");
+            return;
+        }
+
+        Map <String, String> params = rq.getParams();
+
+        if (!params.containsKey("id")) {
+            System.out.println("Please enter the ID number.");
+            return;
+        }
+
+        int id = 0;
+
+        try {
+            id = Integer.parseInt(params.get("id"));
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter the proper ID number.");
+            return;
+        }
+
+        if (id > articles.size()) {
+            System.out.printf("Article %d is not existed.\n", id);
+            return;
+        }
+
+        Article article = articles.get(id - 1);
+
+        System.out.print("New Subject : ");
+        article.subject = sc.nextLine();
+
+        System.out.print("New Content : ");
+        article.content = sc.nextLine();
+
+        System.out.printf("Article %d has been successfully modified.\n", id);
     }
 
     private static void actionUsrArticleWrite(Scanner sc, List<Article> articles, int lastArticleId) {
