@@ -38,6 +38,9 @@ public class Main {
             else if (rq.getUrlPath().equals("/usr/article/modify")) {
                 actionUsrArticleModify(sc, rq, articles);
             }
+            else if (rq.getUrlPath().equals("/usr/article/delete")) {
+                actionUsrArticleDelete(rq, articles);
+            }
             else if (rq.getUrlPath().equals("exit")) {
                 System.out.println("Program Ends");
                 break;
@@ -49,6 +52,40 @@ public class Main {
 
         System.out.println("== Java Text Board End ==");
         sc.close();
+    }
+
+    private static void actionUsrArticleDelete(Rq rq, List<Article> articles) {
+        if (articles.isEmpty()) {
+            System.out.println("No article created.");
+            return;
+        }
+
+        Map <String, String> params = rq.getParams();
+
+        if (!params.containsKey("id")) {
+            System.out.println("Please enter the ID number.");
+            return;
+        }
+
+        int id = 0;
+
+        try {
+            id = Integer.parseInt(params.get("id"));
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter the proper ID number.");
+            return;
+        }
+
+        Article article = findById(articles, id);
+
+        if (article == null) {
+            System.out.printf("Article %d is not existed.\n", id);
+            return;
+        }
+
+        articles.remove(article);
+
+        System.out.printf("Article %d has been removed.\n", id);
     }
 
     private static void actionUsrArticleModify(Scanner sc, Rq rq, List<Article> articles) {
@@ -73,12 +110,12 @@ public class Main {
             return;
         }
 
-        if (id > articles.size()) {
+        Article article = findById(articles, id);
+
+        if (article == null) {
             System.out.printf("Article %d is not existed.\n", id);
             return;
         }
-
-        Article article = articles.get(id - 1);
 
         System.out.print("New Subject : ");
         article.subject = sc.nextLine();
@@ -129,12 +166,12 @@ public class Main {
             return;
         }
 
-        if (id > articles.size()) {
+        Article article = findById(articles, id);
+
+        if (article == null) {
             System.out.printf("Article %d is not existed.\n", id);
             return;
         }
-
-        Article article = articles.get(id - 1);
 
         System.out.println("== Article Detail ==");
         System.out.printf("ID : %d\n", article.id);
@@ -183,6 +220,13 @@ public class Main {
         sortedArticles.forEach(
                 article -> System.out.printf("%d | %s\n", article.id, article.subject)
         );
+    }
+
+    private static Article findById(List<Article> articles, int id) {
+        return articles.stream()
+                .filter(article -> article.id == id)
+                .findFirst()
+                .orElse(null);
     }
 }
 
